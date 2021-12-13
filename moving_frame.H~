@@ -1,0 +1,45 @@
+scalar alpha = (mesh.time().value() - mesh.time().deltaTValue())/(mesh.time().value());
+scalar beta = (mesh.time().deltaTValue())/(mesh.time().value());
+
+forAll(mesh.C(), cellI)
+{
+	//Specifying threshold condition
+	if (D[cellI]>1000.255)
+		//Time averafing velocity feild
+		umean[cellI] = alpha*umean[cellI] + beta*U[cellI];
+		//Calculating fluctuating velocity feild
+		Ufluc[cellI] = U[cellI] - umean[cellI];
+
+		uprime[cellI] = Ufluc[cellI].component(0);
+		vprime[cellI] = Ufluc[cellI].component(1);
+		wprime[cellI] = Ufluc[cellI].component(2);
+
+		uprime2[cellI] = uprime[cellI]*uprime[cellI]; 
+		vprime2[cellI] = vprime[cellI]*vprime[cellI];
+		wprime2[cellI] = wprime[cellI]*wprime[cellI];
+	
+		uprime2mean[cellI] = alpha*uprime2mean[cellI] + (1-alpha)*sqr(U[cellI].component(0)) - sqr(umean[cellI].component(0));
+		vprime2mean[cellI] = alpha*vprime2mean[cellI] + (1-alpha)*sqr(U[cellI].component(1)) - sqr(umean[cellI].component(1));
+		wprime2mean[cellI] = alpha*wprime2mean[cellI] + (1-alpha)*sqr(U[cellI].component(2)) - sqr(umean[cellI].component(2));
+
+		Tke[cellI] = 0.5*(uprime2mean[cellI]+vprime2mean[cellI]+wprime2mean[cellI]);
+
+		kuprime[cellI] =  Tke[cellI]*uprime[cellI];
+		kvprime[cellI] =  Tke[cellI]*vprime[cellI];
+		kwprime[cellI] =  Tke[cellI]*wprime[cellI];
+
+		kuprimeMean[cellI] = alpha*kuprimeMean[cellI] + beta*kuprime[cellI];
+		kvprimeMean[cellI] = alpha*kvprimeMean[cellI] + beta*kvprime[cellI];
+		kwprimeMean[cellI] = alpha*kwprimeMean[cellI] + beta*kwprime[cellI];
+		
+		
+		
+}
+
+B= turbulence->R();
+
+
+
+
+
+
